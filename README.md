@@ -2,7 +2,7 @@
 
 Centrally managed Dangerfile(s) for  the Technekes organization
 
-# Usage
+## Usage
 
 Import the Dangerfile from this repository into your projects Dangerfile
 
@@ -10,3 +10,7 @@ Import the Dangerfile from this repository into your projects Dangerfile
 # Dangerfile
 danger.import_dangerfile(github: 'technekes/danger')
 ```
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
