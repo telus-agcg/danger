@@ -41,7 +41,7 @@ def version_bump?
 end
 
 def strip_doc(doc)
-  doc.strip.tr(/\n/, ' ').tr(/  /, '')
+  doc.strip.tr('\n', ' ').tr('  ', '')
 end
 
 # ------------------------------------------------------------------------------
