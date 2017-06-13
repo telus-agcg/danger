@@ -41,14 +41,14 @@ def version_bump?
 end
 
 def strip_doc(doc)
-  doc.strip.tr('\n', ' ').tr('  ', '')
+  doc.strip.tr("\n", ' ')
 end
 
 # ------------------------------------------------------------------------------
 # You've made changes to lib, but didn't write any tests?
 # ------------------------------------------------------------------------------
 if app_changes? && !spec_changes?
-  missing_tests_message = <<-MESSAGE
+  missing_tests_message = <<~MESSAGE
     There are library changes, but not tests. That's OK as long as you're
     refactoring existing code.
   MESSAGE
@@ -60,7 +60,7 @@ end
 # You've made changes to specs, but no library code has changed?
 # ------------------------------------------------------------------------------
 if !app_changes? && spec_changes?
-  missing_code_message = <<-MESSAGE
+  missing_code_message = <<~MESSAGE
     We really appreciate pull requests that demonstrate issues, even without a
     fix. That said, the next step is to try and fix the failing tests!
   MESSAGE
