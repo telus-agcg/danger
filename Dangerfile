@@ -83,8 +83,7 @@ warn('Big PR') if git.lines_of_code > 500
 # ------------------------------------------------------------------------------
 if !changelog_modified? && app_changes? && !declared_trivial?
   changelog_message = <<-MESSAGE
-    Please include a CHANGELOG entry. You can find it at
-    [CHANGELOG.md](https://github.com/techneks/nib/blob/master/CHANGELOG.md).
+    Please include a CHANGELOG entry. You can find it at ./CHANGELOG.md
   MESSAGE
 
   fail(strip_doc(changelog_message))
