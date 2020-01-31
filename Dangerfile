@@ -23,7 +23,7 @@ end
 # Is this declared a trivial change?
 # ------------------------------------------------------------------------------
 def declared_trivial?
-  !(github.pr_labels.include? 'trivial')
+  github.pr_labels.include?('trivial')
 end
 
 # ------------------------------------------------------------------------------
