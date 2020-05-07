@@ -30,9 +30,16 @@ def multiple_program_sets?
   modified_program_sets.count > 1
 end
 
+def program_set_from_pr_title
+  directories.find { |directory| github.pr_title.include?(directory) }
+end
+
+def program_set_from_branch_name
+  directories.find { |directory| branch_name.include?(directory) }
+end
+
 def program_set
-  @program_set ||=
-    directories.find { |directory| github.pr_title.include?(directory) }
+  @program_set ||= program_set_from_pr_title || program_set_from_branch_name
 end
 
 def commit_subject
@@ -56,7 +63,9 @@ def merge_branch?
 end
 
 def branch_name
-  @branch_name ||= github.branch_for_head
+  @branch_name ||=
+    github.branch_for_head ||
+    `git rev-parse abbrev-ref HEAD`
 end
 
 def branch_contains_program_set?
@@ -71,7 +80,7 @@ def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
 
-unless branch_contains_program_set? && branch_contains_feature?
+unless program_set && branch_contains_program_set? && branch_contains_feature?
   invalid_branch_name_message = <<~MESSAGE
     'feature' and/or 'program-set-key' are not in the branch name. Unfortunately,
     you'll need to rename your branch then create a new pull request.
@@ -81,7 +90,7 @@ unless branch_contains_program_set? && branch_contains_feature?
   fail(strip_doc(invalid_branch_name_message))
 end
 
-unless github.pr_title.include?(program_set)
+unless program_set && github.pr_title.include?(program_set)
   invalid_pr_title_message = <<~MESSAGE
     Please include the program-set in your pull request title.
     Here's an example: `[incent-config-foo-bar] Add UOMs`
@@ -90,7 +99,7 @@ unless github.pr_title.include?(program_set)
   fail(strip_doc(invalid_pr_title_message))
 end
 
-unless valid_commit_message?
+unless program_set && valid_commit_message?
   validation = merge_branch? ? 'title or body' : 'title'
 
   invalid_commit_message = <<~MESSAGE
