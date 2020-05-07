@@ -1,0 +1,106 @@
+def rakefile_added?
+  git.added_files.include?('Rakefile')
+end
+
+def ignore_list
+  %w(
+    .
+    ..
+    .circleci
+    .git
+    bin
+    docs
+    exceptions
+  )
+end
+
+def directories
+  @directories ||= Dir.entries('.')
+    .select { |e| File.directory?(e) }
+    .reject { |e| ignore_list.include?(e) }
+end
+
+def modified_program_sets
+  @modified_program_sets ||= directories
+    .map { |file| file.split('/')[1] }
+    .uniq
+end
+
+def multiple_program_sets?
+  modified_program_sets.count > 1
+end
+
+def program_set
+  @program_set ||=
+    directories.find { |directory| github.pr_title.include?(directory) }
+end
+
+def commit_subject
+  @commit_subject ||= `git log --pretty=format:%s --reverse -1`
+end
+
+def commit_body
+  @commit_body ||= `git log --pretty=format:%b --reverse -1`
+end
+
+def valid_commit_message?
+  if merge_branch?
+    commit_subject.include?(program_set) || commit_body.include?(program_set)
+  else
+    commit_subject.include?(program_set)
+  end
+end
+
+def merge_branch?
+  @merge_branch ||= commit_subject.start_with?('Merge')
+end
+
+def branch_name
+  @branch_name ||= github.branch_for_head
+end
+
+def branch_contains_program_set?
+  directories.select { |directory| branch_name.include?(directory) }.any?
+end
+
+def branch_contains_feature?
+  branch_name.start_with?('feature')
+end
+
+def strip_doc(doc)
+  doc.strip.tr("\n", ' ')
+end
+
+unless branch_contains_program_set? && branch_contains_feature?
+  invalid_branch_name_message = <<~MESSAGE
+    'feature' and/or 'program-set-key' are not in the branch name. Unfortunately,
+    you'll need to rename your branch then create a new pull request.
+    Here's an example: `feature/2020-foo-bar/update-uoms`
+  MESSAGE
+
+  fail(strip_doc(invalid_branch_name_message))
+end
+
+unless github.pr_title.include?(program_set)
+  invalid_pr_title_message = <<~MESSAGE
+    Please include the program-set in your pull request title.
+    Here's an example: `[incent-config-foo-bar] Add UOMs`
+  MESSAGE
+
+  fail(strip_doc(invalid_pr_title_message))
+end
+
+unless valid_commit_message?
+  validation = merge_branch? ? 'title or body' : 'title'
+
+  invalid_commit_message = <<~MESSAGE
+    Please include the program-set in your commit #{validation}.
+    Here's an example: `[incent-config-foo-bar] Add UOMs`
+  MESSAGE
+
+  fail(strip_doc(invalid_commit_message))
+end
+
+fail('Please only modify one program-set at a time') if multiple_program_sets?
+
+fail('Please do not add Rakefiles to config repos') if rakefile_added?
