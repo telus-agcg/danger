@@ -97,6 +97,6 @@ message(':tada:') if version_bump? && github.pr_author != 'johnallen3d'
 # ------------------------------------------------------------------------------
 # Don't let testing shortcuts get into master by accident
 # ------------------------------------------------------------------------------
-warn('xdescribe left in tests') if `grep -r " xdescribe" spec | grep -v spec_helper`.length > 1
-warn('xit left in tests') if `grep -r " xit" spec | grep -v spec_helper`.length > 1
-fail(':focus left in tests') if `grep -r ":focus" spec | grep -v spec_helper`.length > 1
+warn('xdescribe left in tests') if `grep -r " xdescribe" spec | grep -v ._helper`.length > 1
+warn('xit left in tests') if `grep -r " xit" spec | grep -v ._helper`.length > 1
+fail(':focus left in tests') if `grep -r ":focus" spec | grep -v ._helper`.length > 1
