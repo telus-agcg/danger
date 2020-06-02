@@ -21,8 +21,9 @@ def directories
 end
 
 def modified_program_sets
-  @modified_program_sets ||= directories
-    .map { |file| file.split('/')[1] }
+  @modified_program_sets ||= git.modified_files
+    .concat(git.added_files)
+    .map { |file| file.split('/')[0] }
     .uniq
 end
 
