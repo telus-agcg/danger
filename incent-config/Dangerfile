@@ -21,8 +21,9 @@ def directories
 end
 
 def modified_program_sets
-  @modified_program_sets ||= directories
-    .map { |file| file.split('/')[1] }
+  @modified_program_sets ||= git.modified_files
+    .concat(git.added_files)
+    .map { |file| file.split('/')[0] }
     .uniq
 end
 
@@ -34,7 +35,7 @@ def program_set
   return 'na' if not_applicable_pr_title?
 
   @program_set ||=
-    directories.find { |directory| github.pr_title.include?(directory) }
+    directories.find { |dir| github.pr_title.include?("[#{dir}]") }.to_s
 end
 
 def commit_subject
@@ -95,6 +96,8 @@ def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
 
+fail('Unknown program-set. Are the branch and PR named correctly?') if program_set.empty?
+
 unless branch_contains_program_set? && branch_contains_feature?
   invalid_branch_name_message = <<~MESSAGE
     'feature' and/or 'program-set-key' are not in the branch name. Unfortunately,
@@ -130,4 +133,3 @@ end
 fail('Please only modify one program-set at a time') if multiple_program_sets?
 
 fail('Please do not add Rakefiles to config repos') if rakefile_added?
-
