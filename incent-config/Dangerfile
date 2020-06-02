@@ -30,16 +30,11 @@ def multiple_program_sets?
   modified_program_sets.count > 1
 end
 
-def program_set_from_pr_title
-  directories.find { |directory| github.pr_title.include?(directory) }
-end
-
-def program_set_from_branch_name
-  directories.find { |directory| branch_name.include?(directory) }
-end
-
 def program_set
-  @program_set ||= program_set_from_pr_title || program_set_from_branch_name
+  return 'na' if not_applicable_pr_title?
+
+  @program_set ||=
+    directories.find { |directory| github.pr_title.include?(directory) }
 end
 
 def commit_subject
@@ -50,10 +45,30 @@ def commit_body
   @commit_body ||= `git log --pretty=format:%b --reverse -1`
 end
 
+def not_applicable_pr_title?
+  github.pr_title.start_with?('[na]')
+end
+
+def not_applicable_branch_name?
+  branch_name.include?('/na/')
+end
+
+def not_applicable_subject?
+  commit_subject.include?('[na]')
+end
+
+def not_applicable_body?
+  commit_body.include?('[na]')
+end
+
 def valid_commit_message?
   if merge_branch?
+    return true if not_applicable_subject? || not_applicable_body?
+
     commit_subject.include?(program_set) || commit_body.include?(program_set)
   else
+    return true if not_applicable_subject?
+
     commit_subject.include?(program_set)
   end
 end
@@ -63,12 +78,12 @@ def merge_branch?
 end
 
 def branch_name
-  @branch_name ||=
-    github.branch_for_head ||
-    `git rev-parse abbrev-ref HEAD`
+  @branch_name ||= github.branch_for_head
 end
 
 def branch_contains_program_set?
+  return true if not_applicable_branch_name?
+
   directories.select { |directory| branch_name.include?(directory) }.any?
 end
 
@@ -80,7 +95,7 @@ def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
 
-unless program_set && branch_contains_program_set? && branch_contains_feature?
+unless branch_contains_program_set? && branch_contains_feature?
   invalid_branch_name_message = <<~MESSAGE
     'feature' and/or 'program-set-key' are not in the branch name. Unfortunately,
     you'll need to rename your branch then create a new pull request.
@@ -90,21 +105,23 @@ unless program_set && branch_contains_program_set? && branch_contains_feature?
   fail(strip_doc(invalid_branch_name_message))
 end
 
-unless program_set && github.pr_title.include?(program_set)
+unless github.pr_title.include?(program_set)
   invalid_pr_title_message = <<~MESSAGE
-    Please include the program-set in your pull request title.
-    Here's an example: `[incent-config-foo-bar] Add UOMs`
+    Please include the program-set in your Pull Request title.
+    Here's an example: `[incent-config-foo-bar] Add UOMs`. Or if this does not
+    relate to a specific program-set: `[na] Update .gitignore`.
   MESSAGE
 
   fail(strip_doc(invalid_pr_title_message))
 end
 
-unless program_set && valid_commit_message?
+unless valid_commit_message?
   validation = merge_branch? ? 'title or body' : 'title'
 
   invalid_commit_message = <<~MESSAGE
     Please include the program-set in your commit #{validation}.
-    Here's an example: `[incent-config-foo-bar] Add UOMs`
+    Here's an example: `[incent-config-foo-bar] Add UOMs`. Or if this does not
+    relate to a specific program-set: `[na] Update .gitignore`.
   MESSAGE
 
   fail(strip_doc(invalid_commit_message))
@@ -113,3 +130,4 @@ end
 fail('Please only modify one program-set at a time') if multiple_program_sets?
 
 fail('Please do not add Rakefiles to config repos') if rakefile_added?
+
