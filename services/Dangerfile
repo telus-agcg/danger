@@ -1,0 +1,88 @@
+# -----------------------------------------------------------------------------
+# Have any changes happened inside the actual library code?
+# -----------------------------------------------------------------------------
+def app_changes?
+  !git.modified_files.grep(/app/).empty?
+end
+
+# -----------------------------------------------------------------------------
+# Are there an changes to the specs
+# -----------------------------------------------------------------------------
+def spec_changes?
+  !git.modified_files.grep(/spec/).empty?
+end
+
+# -----------------------------------------------------------------------------
+# Is this declared a work in progress
+# -----------------------------------------------------------------------------
+def declared_wip?
+  github.pr_labels.map(&:downcase).include?('wip') ||
+    github.pr_title.downcase.include?('[wip]')
+end
+
+def strip_doc(doc)
+  doc.strip.tr("\n", ' ')
+end
+
+# -----------------------------------------------------------------------------
+# You've made changes to lib, but didn't write any tests?
+# -----------------------------------------------------------------------------
+if app_changes? && !spec_changes?
+  missing_tests_message = <<~MESSAGE
+    There are library changes, but not tests. That's OK as long as you're
+    refactoring existing code.
+  MESSAGE
+
+  warn(strip_doc(missing_tests_message))
+end
+
+# -----------------------------------------------------------------------------
+# You've made changes to specs, but no library code has changed?
+# -----------------------------------------------------------------------------
+if !app_changes? && spec_changes?
+  missing_code_message = <<~MESSAGE
+    We really appreciate pull requests that demonstrate issues, even without a
+    fix. That said, the next step is to try and fix the failing tests!
+  MESSAGE
+
+  message(strip_doc(missing_code_message))
+end
+
+# -----------------------------------------------------------------------------
+# warn on all checks for commit message
+# -----------------------------------------------------------------------------
+commit_lint.check warn: :all
+
+# -----------------------------------------------------------------------------
+# warn if github PR body length less than 5
+# -----------------------------------------------------------------------------
+if github.pr_body.length < 5
+  warn 'Please provide a summary in the Pull Request description'
+end
+
+# -----------------------------------------------------------------------------
+# Make it more obvious that a PR is a work in progress and shouldn't be merged
+# -----------------------------------------------------------------------------
+if declared_wip?
+  fail('PR is classed as "wip" use GitHub native "draft" feature instead')
+end
+
+# -----------------------------------------------------------------------------
+# Warn when there is a big PR
+# -----------------------------------------------------------------------------
+warn('Big PR') if git.lines_of_code > 500
+
+# -----------------------------------------------------------------------------
+# Don't let testing shortcuts get into master by accident
+# -----------------------------------------------------------------------------
+if `grep -r " xcontext" spec | grep -v spec_helper`.length > 1
+  warn 'xcontext left in tests'
+end
+if `grep -r " xit" spec | grep -v spec_helper`.length > 1
+  warn 'xit left in tests'
+end
+if `grep -r ":focus" spec | grep -v spec_helper`.length > 1
+  fail ':focus left in tests'
+end
+
+fail('Please add a description for your PR') if github.pr_body.empty?
