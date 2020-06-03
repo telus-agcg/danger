@@ -134,3 +134,5 @@ end
 fail('Please only modify one program-set at a time') if multiple_program_sets?
 
 fail('Please do not add Rakefiles to config repos') if rakefile_added?
+
+fail('Please add a description for your PR') if github.pr_body.empty?
