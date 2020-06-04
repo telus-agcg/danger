@@ -34,11 +34,41 @@ def multiple_program_sets?
   modified_program_sets.count > 1
 end
 
-def program_set
+def program_set_from_pr_title
   return 'na' if not_applicable_pr_title?
 
-  @program_set ||=
+  @program_set_from_pr_title ||=
     directories.find { |dir| github.pr_title.include?("[#{dir}]") }.to_s
+end
+
+def program_set_from_branch
+  return 'na' if not_applicable_branch_name?
+
+  branch_name.split('/')[1]
+end
+
+def program_set_from_commit
+  return 'na' if commit_subject.include?('[na]') || commit_body.include?('[na]')
+
+  @program_set_from_commit ||= directories.find do |dir|
+    commit_subject.include?("[#{dir}]") || commit_body.include?("[#{dir}]")
+  end
+end
+
+def program_set_candidates
+  @program_set_candidates ||= [
+    program_set_from_pr_title,
+    program_set_from_branch,
+    program_set_from_commit
+  ].compact.uniq
+end
+
+def program_set_mismatch?
+  program_set_candidates.length != 1
+end
+
+def program_set
+  program_set_candidates.first
 end
 
 def commit_subject
@@ -99,7 +129,9 @@ def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
 
-fail('Unknown program-set. Are the branch and PR named correctly?') if program_set.empty?
+if program_set_mismatch?
+  fail('Unknown program-set. Are the branch and PR both named correctly?')
+end
 
 unless branch_contains_program_set? && branch_contains_feature?
   invalid_branch_name_message = <<~MESSAGE
