@@ -2,6 +2,13 @@ def rakefile_added?
   git.added_files.include?('Rakefile')
 end
 
+def prefixes
+  %w(
+    feature
+    release
+  )
+end
+
 def ignore_list
   %w(
     .
@@ -121,8 +128,8 @@ def branch_contains_program_set?
   directories.select { |directory| branch_name.include?(directory) }.any?
 end
 
-def branch_contains_feature?
-  branch_name.start_with?('feature')
+def branch_contains_prefix?
+  prefixes.any? { |prefix| branch_name.start_with?(prefix) }
 end
 
 def strip_doc(doc)
@@ -133,11 +140,11 @@ if program_set_mismatch?
   fail('Unknown program-set. Are the branch and PR both named correctly?')
 end
 
-unless branch_contains_program_set? && branch_contains_feature?
+unless branch_contains_program_set? && branch_contains_prefix?
   invalid_branch_name_message = <<~MESSAGE
-    'feature' and/or 'program-set-key' are not in the branch name. Unfortunately,
-    you'll need to rename your branch then create a new pull request.
-    Here's an example: `feature/2020-foo-bar/update-uoms`
+    'feature' (or 'release') and/or 'program-set-key' are not in the branch name.
+    Unfortunately, you'll need to rename your branch then create a new pull
+    request.  Here's an example: `feature/2020-foo-bar/update-uoms`
   MESSAGE
 
   fail(strip_doc(invalid_branch_name_message))
