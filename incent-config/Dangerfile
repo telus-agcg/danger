@@ -141,7 +141,7 @@ def rendered_programs_changed?
 end
 
 if rendered_programs_changed?
-  fail('Changes occoured while rendering')
+  fail('Changes occurred while rendering - generate files from templates before pushing')
 end
 
 if program_set_mismatch?
