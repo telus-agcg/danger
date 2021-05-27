@@ -136,14 +136,6 @@ def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
 
-def rendered_programs_changed?
-  `git status --short | wc -l`.strip != '0'
-end
-
-if rendered_programs_changed?
-  fail('Changes occurred while rendering - generate files from templates before pushing')
-end
-
 if program_set_mismatch?
   fail('Unknown program-set. Are the branch and PR both named correctly?')
 end
