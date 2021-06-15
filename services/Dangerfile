@@ -21,6 +21,13 @@ def declared_wip?
 end
 
 # ------------------------------------------------------------------------------
+# Is this declared a trivial change?
+# ------------------------------------------------------------------------------
+def declared_trivial?
+  github.pr_labels.include?('trivial')
+end
+
+# ------------------------------------------------------------------------------
 # Is CHANGELOG modifie?
 # ------------------------------------------------------------------------------
 def changelog_modified?
@@ -93,3 +100,14 @@ if `grep -r ":focus" spec | grep -v spec_helper`.length > 1
 end
 
 fail('Please add a description for your PR') if github.pr_body.empty?
+
+# ------------------------------------------------------------------------------
+# Requre a CHANGELOG entry for library changes
+# ------------------------------------------------------------------------------
+if !changelog_modified? && app_changes? && !declared_trivial?
+  changelog_message = <<-MESSAGE
+    Please include a CHANGELOG entry. You can find it at ./CHANGELOG.md
+  MESSAGE
+
+  fail(strip_doc(changelog_message))
+end
