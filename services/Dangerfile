@@ -20,6 +20,13 @@ def declared_wip?
     github.pr_title.downcase.include?('[wip]')
 end
 
+# ------------------------------------------------------------------------------
+# Is CHANGELOG modifie?
+# ------------------------------------------------------------------------------
+def changelog_modified?
+  git.modified_files.include?('CHANGELOG.md')
+end
+
 def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
