@@ -66,7 +66,8 @@ def program_set_candidates
   @program_set_candidates ||= [
     program_set_from_pr_title,
     program_set_from_branch,
-    program_set_from_commit
+    program_set_from_commit,
+    modified_program_sets.first
   ].compact.uniq
 end
 
@@ -132,6 +133,10 @@ def branch_contains_prefix?
   prefixes.any? { |prefix| branch_name.start_with?(prefix) }
 end
 
+def branch_name_contains_underscore?
+  return true if branch_name.include? "_"
+end
+
 def strip_doc(doc)
   doc.strip.tr("\n", ' ')
 end
@@ -148,9 +153,10 @@ if program_set_mismatch?
   fail('Unknown program-set. Are the branch and PR both named correctly?')
 end
 
-unless branch_contains_program_set? && branch_contains_prefix?
+unless branch_contains_program_set? && branch_contains_prefix? && branch_name_contains_underscore?
   invalid_branch_name_message = <<~MESSAGE
-    'feature' (or 'release') and/or 'program-set-key' are not in the branch name.
+    'feature' (or 'release') and/or 'program-set-key' are not in the branch name or
+    branch name includes underscores insteas of hyphens.
     Unfortunately, you'll need to rename your branch then create a new pull
     request.  Here's an example: `feature/2020-foo-bar/update-uoms`
   MESSAGE
