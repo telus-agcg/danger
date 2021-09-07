@@ -75,7 +75,7 @@ def program_set_mismatch?
 end
 
 def program_set
-  program_set_candidates.first
+  `./targeted-program-set`
 end
 
 def commit_subject
