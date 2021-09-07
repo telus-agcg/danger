@@ -134,7 +134,7 @@ def branch_contains_prefix?
 end
 
 def branch_name_contains_no_underscore?
-  @branch_name_contains_underscore ||= !branch_name.include?('_')
+  @branch_name_contains_no_underscore ||= !branch_name.include?('_')
 end
 
 def strip_doc(doc)
