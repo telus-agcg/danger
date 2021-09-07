@@ -133,8 +133,8 @@ def branch_contains_prefix?
   prefixes.any? { |prefix| branch_name.start_with?(prefix) }
 end
 
-def branch_name_contains_underscore?
-  @branch_name_contains_underscore ||= branch_name.include?('_')
+def branch_name_contains_no_underscore?
+  @branch_name_contains_underscore ||= !branch_name.include?('_')
 end
 
 def strip_doc(doc)
@@ -159,7 +159,7 @@ if program_set_mismatch?
   fail(strip_doc(program_set_mismatch_message))
 end
 
-unless branch_contains_program_set? && branch_contains_prefix? && !branch_name_contains_underscore?
+unless branch_contains_program_set? && branch_contains_prefix? && branch_name_contains_no_underscore?
   invalid_branch_name_message = <<~MESSAGE
     'feature' (or 'release') and/or 'program-set-key' are not in the branch name or
     branch name includes underscores insteas of hyphens.
