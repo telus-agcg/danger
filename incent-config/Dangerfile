@@ -146,7 +146,7 @@ def rendered_programs_changed?
 end
 
 message("targeted-program-set detected: #{program_set}")
-message("targeted-program-set using ./targeted_program_set: #{`./targeted_program_set`}")
+# message("targeted-program-set using ./targeted_program_set: #{`./targeted_program_set`}")
 
 if rendered_programs_changed?
   rendered_programs_changed_message = <<~MESSAGE
