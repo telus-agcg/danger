@@ -145,6 +145,9 @@ def rendered_programs_changed?
   `git status #{program_set}/programs --short | wc -l`.strip != '0'
 end
 
+message("targeted-program-set detected: #{program_set}")
+message("Current directory: #{`pwd`}")
+
 if rendered_programs_changed?
   fail('Changes occurred while rendering - generate files from templates before pushing')
 end
