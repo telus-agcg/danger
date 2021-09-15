@@ -146,10 +146,16 @@ def rendered_programs_changed?
 end
 
 message("targeted-program-set detected: #{program_set}")
-message("Current directory: #{`pwd`}")
+message("targeted-program-set using ./targeted_program_set: #{`./targeted_program_set`}")
 
 if rendered_programs_changed?
-  fail('Changes occurred while rendering - generate files from templates before pushing')
+  rendered_programs_changed_message = <<~MESSAGE
+    Changes occurred while rendering.
+    Please generate files from templates before pushing by running:
+    `incent-validate-program-set`.
+  MESSAGE
+
+  fail(strip_doc(rendered_programs_changed_message))
 end
 
 if program_set_mismatch?
