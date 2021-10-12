@@ -150,7 +150,7 @@ def release_branch?
 end
 
 def base_branch_master?
-  @base_branch_master ||= github.branch_for_base.eql? ('master')
+  @base_branch_master ||= github.branch_for_base.eql?('master')
 end
 
 message("targeted-program-set detected: #{program_set}")
