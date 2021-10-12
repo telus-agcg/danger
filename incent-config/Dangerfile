@@ -145,8 +145,20 @@ def rendered_programs_changed?
   `git status #{program_set}/programs --short | wc -l`.strip != '0'
 end
 
+def release_branch?
+  @release_branch ||= branch_name.start_with?('release')
+end
+
+def base_branch_master?
+  @base_branch_master ||= github.branch_for_base.eql?('master')
+end
+
 message("targeted-program-set detected: #{program_set}")
 # message("targeted-program-set using ./targeted_program_set: #{`./targeted_program_set`}")
+
+if base_branch_master? && !release_branch?
+  fail('Please use `release` branch for PR into master')
+end
 
 if rendered_programs_changed?
   rendered_programs_changed_message = <<~MESSAGE
