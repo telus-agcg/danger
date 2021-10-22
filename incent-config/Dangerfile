@@ -32,6 +32,7 @@ end
 def modified_program_sets
   @modified_program_sets ||= git.modified_files
     .concat(git.added_files)
+    .concat(git.deleted_files)
     .map { |file| file.split('/')[0] }
     .reject { |file| ignore_list.include?(file) }
     .uniq
