@@ -1,10 +1,12 @@
-danger.import_dangerfile(
-  github: 'technekes/danger',
-  path: 'Dangerfile'
-)
-
 def rakefile_added?
   git.added_files.include?('Rakefile')
+end
+
+def prefixes
+  %w(
+    feature
+    release
+  )
 end
 
 def ignore_list
@@ -118,14 +120,38 @@ def merge_branch?
   @merge_branch ||= commit_subject.start_with?('Merge')
 end
 
+def branch_name
+  @branch_name ||= github.branch_for_head
+end
+
 def branch_contains_program_set?
   return true if not_applicable_branch_name?
 
   directories.select { |directory| branch_name.include?(directory) }.any?
 end
 
+def branch_contains_prefix?
+  prefixes.any? { |prefix| branch_name.start_with?(prefix) }
+end
+
+def branch_name_contains_no_underscore?
+  @branch_name_contains_no_underscore ||= !branch_name.include?('_')
+end
+
+def strip_doc(doc)
+  doc.strip.tr("\n", ' ')
+end
+
 def rendered_programs_changed?
   `git status #{program_set}/programs --short | wc -l`.strip != '0'
+end
+
+def release_branch?
+  @release_branch ||= branch_name.start_with?('release')
+end
+
+def base_branch_master?
+  @base_branch_master ||= github.branch_for_base.eql?('master')
 end
 
 message("targeted-program-set detected: #{program_set}")
