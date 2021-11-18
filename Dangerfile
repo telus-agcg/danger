@@ -100,3 +100,52 @@ message(':tada:') if version_bump? && github.pr_author != 'johnallen3d'
 warn('xdescribe left in tests') if `grep -r " xdescribe" spec | grep -v ._helper`.length > 1
 warn('xit left in tests') if `grep -r " xit" spec | grep -v ._helper`.length > 1
 fail(':focus left in tests') if `grep -r ":focus" spec | grep -v ._helper`.length > 1
+
+# ------------------------------------------------------------------------------
+# Addtional generic methods
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Prefixes needed for branch names
+# ------------------------------------------------------------------------------
+def prefixes
+  %w(
+    feature
+    release
+  )
+end
+
+# ------------------------------------------------------------------------------
+# Returns the name of current branch
+# ------------------------------------------------------------------------------
+def branch_name
+  @branch_name ||= github.branch_for_head
+end
+
+# ------------------------------------------------------------------------------
+# Does your branch have a prefix?
+# ------------------------------------------------------------------------------
+def branch_contains_prefix?
+  prefixes.any? { |prefix| branch_name.start_with?(prefix) }
+end
+
+# ------------------------------------------------------------------------------
+# Does your branch contain no underscores?
+# ------------------------------------------------------------------------------
+def branch_name_contains_no_underscore?
+  @branch_name_contains_no_underscore ||= !branch_name.include?('_')
+end
+
+# ------------------------------------------------------------------------------
+# Is this a release branch?
+# ------------------------------------------------------------------------------
+def release_branch?
+  @release_branch ||= branch_name.start_with?('release')
+end
+
+# ------------------------------------------------------------------------------
+# Is master the base branch?
+# ------------------------------------------------------------------------------
+def base_branch_master?
+  @base_branch_master ||= github.branch_for_base.eql?('master')
+end
