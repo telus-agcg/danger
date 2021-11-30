@@ -79,17 +79,6 @@ warn('PR is classed as Work in Progress') if declared_wip?
 warn('Big PR') if git.lines_of_code > 500
 
 # ------------------------------------------------------------------------------
-# Requre a CHANGELOG entry for library changes
-# ------------------------------------------------------------------------------
-if !changelog_modified? && app_changes? && !declared_trivial?
-  changelog_message = <<-MESSAGE
-    Please include a CHANGELOG entry. You can find it at ./CHANGELOG.md
-  MESSAGE
-
-  fail(strip_doc(changelog_message))
-end
-
-# ------------------------------------------------------------------------------
 # Thank contributors
 # ------------------------------------------------------------------------------
 message(':tada:') if version_bump? && github.pr_author != 'johnallen3d'
