@@ -71,6 +71,8 @@ def program_set_candidates
 end
 
 def program_set_mismatch?
+  return false if program_set_from_branch == 'na'
+
   program_set_candidates.length != 1
 end
 
