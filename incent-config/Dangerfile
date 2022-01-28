@@ -96,19 +96,19 @@ def not_applicable?(text)
 end
 
 def not_applicable_pr_title?
-  not_applicable?(pr_title)
+  @not_applicable_pr_title ||= not_applicable?(pr_title)
 end
 
 def not_applicable_branch_name?
-  branch_name.include?('/na/')
+  @not_applicable_branch_name ||= branch_name.include?('/na/')
 end
 
 def not_applicable_subject?
-  not_applicable?(commit_subject)
+  @not_applicable_subject ||= not_applicable?(commit_subject)
 end
 
 def not_applicable_body?
-  not_applicable?(commit_body)
+  @not_applicable_body ||= not_applicable?(commit_body)
 end
 
 def valid_commit_message?
