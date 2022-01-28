@@ -57,7 +57,10 @@ def program_set_from_commit
   return 'na' if not_applicable_subject? || not_applicable_body?
 
   @program_set_from_commit ||= directories.find do |dir|
-    commit_subject.include?("[#{dir}]") || commit_body.include?("[#{dir}]") || commit_subject.include?("(#{dir})") || commit_body.include?("(#{dir})")
+    commit_subject.include?("[#{dir}]") ||
+      commit_body.include?("[#{dir}]") ||
+      commit_subject.include?("(#{dir})") ||
+      commit_body.include?("(#{dir})")
   end
 end
 
@@ -97,11 +100,11 @@ def not_applicable_branch_name?
 end
 
 def not_applicable_subject?
-  commit_subject.include?('[na]') || commit_subject.include?('(na)')
+  ["[na]", "(na)"].any? { |na| commit_subject.include?(na) }
 end
 
 def not_applicable_body?
-  commit_body.include?('[na]') || commit_body.include?('(na)')
+  ["[na]", "(na)"].any? { |na| commit_body.include?(na) }
 end
 
 def valid_commit_message?
