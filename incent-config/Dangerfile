@@ -91,8 +91,12 @@ def commit_body
   @commit_body ||= `git log --pretty=format:%b --reverse -1`
 end
 
+def not_applicable?(text)
+  ["[na]", "(na)"].any? { |na| text.include?(na) }
+end
+
 def not_applicable_pr_title?
-  ["[na]", "(na)"].any? { |na| pr_title.include?(na) }
+  not_applicable?(pr_title)
 end
 
 def not_applicable_branch_name?
@@ -100,11 +104,11 @@ def not_applicable_branch_name?
 end
 
 def not_applicable_subject?
-  ["[na]", "(na)"].any? { |na| commit_subject.include?(na) }
+  not_applicable?(commit_subject)
 end
 
 def not_applicable_body?
-  ["[na]", "(na)"].any? { |na| commit_body.include?(na) }
+  not_applicable?(commit_body)
 end
 
 def valid_commit_message?
