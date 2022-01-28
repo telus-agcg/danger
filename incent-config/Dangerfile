@@ -92,7 +92,7 @@ def commit_body
 end
 
 def not_applicable_pr_title?
-  github.pr_title.start_with?('[na]') || github.pr_title.include?('(na)')
+  ["[na]", "(na)"].any? { |na| pr_title.include?(na) }
 end
 
 def not_applicable_branch_name?
