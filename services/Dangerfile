@@ -28,7 +28,7 @@ def declared_trivial?
 end
 
 # ------------------------------------------------------------------------------
-# Is CHANGELOG modifie?
+# Is CHANGELOG modified?
 # ------------------------------------------------------------------------------
 def changelog_modified?
   git.modified_files.include?('CHANGELOG.md')
