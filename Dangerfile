@@ -74,11 +74,6 @@ end
 warn('PR is classed as Work in Progress') if declared_wip?
 
 # ------------------------------------------------------------------------------
-# Warn when there is a big PR
-# ------------------------------------------------------------------------------
-warn('Big PR') if git.lines_of_code > 500
-
-# ------------------------------------------------------------------------------
 # Thank contributors
 # ------------------------------------------------------------------------------
 message(':tada:') if version_bump? && github.pr_author != 'johnallen3d'
@@ -137,4 +132,11 @@ end
 # ------------------------------------------------------------------------------
 def base_branch_master?
   @base_branch_master ||= github.branch_for_base.eql?('master')
+end
+
+# ------------------------------------------------------------------------------
+# Does PR body include ADO ticket number?
+# ------------------------------------------------------------------------------
+def pr_has_ticket_number?
+  github.pr_body.include?('AB#')
 end
