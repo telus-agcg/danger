@@ -6,12 +6,11 @@ danger.import_dangerfile(
 fail('Please add a description for your PR') if github.pr_body.empty?
 
 # ------------------------------------------------------------------------------
-# Requre a CHANGELOG entry for library changes
+# Fail when PR body does not have ADO ticket number
 # ------------------------------------------------------------------------------
-if !changelog_modified? && app_changes? && !declared_trivial?
-  changelog_message = <<-MESSAGE
-    Please include a CHANGELOG entry. You can find it at ./CHANGELOG.md
-  MESSAGE
+fail('PR has no ADO ticket number') if !pr_has_ticket_number? && !release_branch?
 
-  fail(strip_doc(changelog_message))
-end
+# ------------------------------------------------------------------------------
+# Warn when there is a big PR
+# ------------------------------------------------------------------------------
+warn('Big PR') if git.lines_of_code > 500

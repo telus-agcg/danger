@@ -44,7 +44,7 @@ def program_set_from_pr_title
   return 'na' if not_applicable_pr_title?
 
   @program_set_from_pr_title ||=
-    directories.find { |dir| github.pr_title.include?("[#{dir}]") }.to_s
+    directories.find { |dir| github.pr_title.include?("[#{dir}]") || github.pr_title.include?("(#{dir})") }.to_s
 end
 
 def program_set_from_branch
@@ -54,10 +54,13 @@ def program_set_from_branch
 end
 
 def program_set_from_commit
-  return 'na' if commit_subject.include?('[na]') || commit_body.include?('[na]')
+  return 'na' if not_applicable_subject? || not_applicable_body?
 
   @program_set_from_commit ||= directories.find do |dir|
-    commit_subject.include?("[#{dir}]") || commit_body.include?("[#{dir}]")
+    commit_subject.include?("[#{dir}]") ||
+      commit_body.include?("[#{dir}]") ||
+      commit_subject.include?("(#{dir})") ||
+      commit_body.include?("(#{dir})")
   end
 end
 
@@ -88,20 +91,24 @@ def commit_body
   @commit_body ||= `git log --pretty=format:%b --reverse -1`
 end
 
+def not_applicable?(text)
+  ["[na]", "(na)"].any? { |na| text.include?(na) }
+end
+
 def not_applicable_pr_title?
-  github.pr_title.start_with?('[na]')
+  @not_applicable_pr_title ||= not_applicable?(pr_title)
 end
 
 def not_applicable_branch_name?
-  branch_name.include?('/na/')
+  @not_applicable_branch_name ||= branch_name.include?('/na/')
 end
 
 def not_applicable_subject?
-  commit_subject.include?('[na]')
+  @not_applicable_subject ||= not_applicable?(commit_subject)
 end
 
 def not_applicable_body?
-  commit_body.include?('[na]')
+  @not_applicable_body ||= not_applicable?(commit_body)
 end
 
 def valid_commit_message?
@@ -195,3 +202,8 @@ fail('Please only modify one program-set at a time') if multiple_program_sets?
 fail('Please do not add Rakefiles to config repos') if rakefile_added?
 
 fail('Please add a description for your PR') if github.pr_body.empty?
+
+# ------------------------------------------------------------------------------
+# Fail when PR body does not have ADO ticket number
+# ------------------------------------------------------------------------------
+fail('PR has no ADO ticket number') if !pr_has_ticket_number?
