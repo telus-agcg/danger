@@ -96,7 +96,7 @@ def not_applicable?(text)
 end
 
 def not_applicable_pr_title?
-  @not_applicable_pr_title ||= not_applicable?(pr_title)
+  @not_applicable_pr_title ||= not_applicable?(github.pr_title)
 end
 
 def not_applicable_branch_name?
