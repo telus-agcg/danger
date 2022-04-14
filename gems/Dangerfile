@@ -8,7 +8,7 @@ fail('Please add a description for your PR') if github.pr_body.empty?
 # ------------------------------------------------------------------------------
 # Fail when PR body does not have ADO ticket number
 # ------------------------------------------------------------------------------
-fail('PR has no ADO ticket number') if !pr_has_ticket_number? && !release_branch?
+fail('PR has no ADO ticket number') if !pr_has_ado_ticket_number? && !release_branch?
 
 # ------------------------------------------------------------------------------
 # Warn when there is a big PR

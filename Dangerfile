@@ -137,6 +137,6 @@ end
 # ------------------------------------------------------------------------------
 # Does PR body include ADO ticket number?
 # ------------------------------------------------------------------------------
-def pr_has_ticket_number?
-  github.pr_body.include?('AB#') || github.pr_body.include?('ZOHO-')
+def pr_has_ado_ticket_number?
+  github.pr_body.include?('AB#')
 end

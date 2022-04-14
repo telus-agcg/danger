@@ -137,6 +137,13 @@ def rendered_programs_changed?
   `git status #{program_set}/programs --short | wc -l`.strip != '0'
 end
 
+# ------------------------------------------------------------------------------
+# Is PR body missing a ZOHO ticket number?
+# ------------------------------------------------------------------------------
+def pr_missing_zoho_ticket_number?
+  (github.pr_body =~ /ZOHO-\d{18}/).nil?
+end
+
 message("targeted-program-set detected: #{program_set}")
 # message("targeted-program-set using ./targeted_program_set: #{`./targeted_program_set`}")
 
@@ -204,6 +211,6 @@ fail('Please do not add Rakefiles to config repos') if rakefile_added?
 fail('Please add a description for your PR') if github.pr_body.empty?
 
 # ------------------------------------------------------------------------------
-# Fail when PR body does not have ADO ticket number
+# Fail when PR body does not have ZOHO ticket number
 # ------------------------------------------------------------------------------
-fail('PR has no ADO ticket number') if !pr_has_ticket_number?
+fail('PR has no ZOHO ticket number') if pr_missing_zoho_ticket_number?
