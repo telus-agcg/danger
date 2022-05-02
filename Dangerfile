@@ -16,7 +16,8 @@ end
 # Is this declared a work in progress
 # ------------------------------------------------------------------------------
 def declared_wip?
-  github.pr_labels.include?('WIP') || github.pr_labels.include?('wip')
+  github.pr_labels.map(&:downcase).include?('wip') ||
+    github.pr_title.downcase.include?('[wip]')
 end
 
 # ------------------------------------------------------------------------------
