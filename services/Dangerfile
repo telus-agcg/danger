@@ -1,66 +1,7 @@
-# -----------------------------------------------------------------------------
-# Have any changes happened inside the actual library code?
-# -----------------------------------------------------------------------------
-def app_changes?
-  !git.modified_files.grep(/app/).empty?
-end
-
-# -----------------------------------------------------------------------------
-# Are there an changes to the specs
-# -----------------------------------------------------------------------------
-def spec_changes?
-  !git.modified_files.grep(/spec/).empty?
-end
-
-# -----------------------------------------------------------------------------
-# Is this declared a work in progress
-# -----------------------------------------------------------------------------
-def declared_wip?
-  github.pr_labels.map(&:downcase).include?('wip') ||
-    github.pr_title.downcase.include?('[wip]')
-end
-
-# ------------------------------------------------------------------------------
-# Is this declared a trivial change?
-# ------------------------------------------------------------------------------
-def declared_trivial?
-  github.pr_labels.include?('trivial')
-end
-
-# ------------------------------------------------------------------------------
-# Is CHANGELOG modified?
-# ------------------------------------------------------------------------------
-def changelog_modified?
-  git.modified_files.include?('CHANGELOG.md')
-end
-
-def strip_doc(doc)
-  doc.strip.tr("\n", ' ')
-end
-
-# -----------------------------------------------------------------------------
-# You've made changes to lib, but didn't write any tests?
-# -----------------------------------------------------------------------------
-if app_changes? && !spec_changes?
-  missing_tests_message = <<~MESSAGE
-    There are library changes, but not tests. That's OK as long as you're
-    refactoring existing code.
-  MESSAGE
-
-  warn(strip_doc(missing_tests_message))
-end
-
-# -----------------------------------------------------------------------------
-# You've made changes to specs, but no library code has changed?
-# -----------------------------------------------------------------------------
-if !app_changes? && spec_changes?
-  missing_code_message = <<~MESSAGE
-    We really appreciate pull requests that demonstrate issues, even without a
-    fix. That said, the next step is to try and fix the failing tests!
-  MESSAGE
-
-  message(strip_doc(missing_code_message))
-end
+danger.import_dangerfile(
+  github: 'technekes/danger',
+  path: 'Dangerfile'
+)
 
 # -----------------------------------------------------------------------------
 # warn if github PR body length less than 5
@@ -95,3 +36,7 @@ if `grep -r ":focus" spec | grep -v spec_helper`.length > 1
 end
 
 fail('Please add a description for your PR') if github.pr_body.empty?
+
+if github.pr_title.include?["build: bump incent from"] || github.pr_title.include?["build: bump incent-config from"]
+  fail('Use `feat` instead of `build` for incent and incent-config updates')
+end
