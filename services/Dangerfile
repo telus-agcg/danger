@@ -37,6 +37,6 @@ end
 
 fail('Please add a description for your PR') if github.pr_body.empty?
 
-if github.pr_title.include?["build: bump incent from"] || github.pr_title.include?["build: bump incent-config from"]
-  fail('Use `feat` instead of `build` for incent and incent-config updates')
+if github.pr_title.include?('build: bump incent from') || github.pr_title.include?('build: bump incent-config from')
+  fail('Use `feat` instead of `build` for incent and incent-config version bumps')
 end
