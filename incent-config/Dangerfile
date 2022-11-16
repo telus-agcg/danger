@@ -18,6 +18,7 @@ def ignore_list
     docs
     exceptions
     README.md
+    shared
   )
 end
 
