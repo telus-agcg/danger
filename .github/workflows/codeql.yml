@@ -1,15 +1,33 @@
-name: "Workflow"
+name: 'CodeQL Workflow'
 
 on:
   pull_request:
-    branches: ["master"]
+    branches: ['master']
   schedule:
-    - cron: "0 16 * * *"
+    - cron: '0 16 * * *'
 
 jobs:
-  codeql_ruby:
-    name: "Run CodeQL (Ruby)"
-    uses: TelusAg/ci-pipeline-templates/.github/workflows/codeql-analysis-template.yml@version/1.3
-    with:
-      agent_os: "ubuntu-latest"
-      code_language: "ruby"
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['ruby']
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Run CodeQL Scan
+        uses: github/codeql-action/analyze@v2
