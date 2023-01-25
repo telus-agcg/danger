@@ -19,6 +19,7 @@ def ignore_list
     exceptions
     README.md
     shared
+    cue.mod
   )
 end
 
