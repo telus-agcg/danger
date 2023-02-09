@@ -13,13 +13,14 @@ def ignore_list
     ..
     .circleci
     .git
+    .github
     .gitignore
+    README.md
     bin
+    cue.mod
     docs
     exceptions
-    README.md
     shared
-    cue.mod
   )
 end
 
