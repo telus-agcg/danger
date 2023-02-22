@@ -162,8 +162,8 @@ if rendered_programs_changed?
   rendered_programs_changed_message = <<~MESSAGE
     Changes occurred while rendering in:
     #{rendered_programs_changes}.
-    Please generate files from templates before pushing by running:
-    `incent-validate-program-set`.
+    Please generate files from templates before pushing by running
+    validations within VS Code.
   MESSAGE
 
   fail(strip_doc(rendered_programs_changed_message))
