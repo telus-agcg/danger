@@ -136,8 +136,12 @@ def branch_contains_program_set?
   directories.select { |directory| branch_name.include?(directory) }.any?
 end
 
+def rendered_programs_changes
+  @rendered_programs_changes ||= `git status #{program_set}/programs --short`
+end
+
 def rendered_programs_changed?
-  `git status #{program_set}/programs --short | wc -l`.strip != '0'
+  !rendered_programs_changes.empty?
 end
 
 # ------------------------------------------------------------------------------
@@ -156,9 +160,10 @@ end
 
 if rendered_programs_changed?
   rendered_programs_changed_message = <<~MESSAGE
-    Changes occurred while rendering.
-    Please generate files from templates before pushing by running:
-    `incent-validate-program-set`.
+    Changes occurred while rendering in:
+    #{rendered_programs_changes}.
+    Please generate files from templates before pushing by running
+    validations within VS Code.
   MESSAGE
 
   fail(strip_doc(rendered_programs_changed_message))
